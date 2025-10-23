@@ -64,12 +64,83 @@
   - có dependencies=> chạy lại khi một trong các dependencies thay đổi
     ![alt text](image-2.png)
   - Trường hợp này chạy vì khi component được re-render thì callbackexample sẽ là 1 hàm mới =>useEffect chạy lại
-#### 8. useState 
+
+#### 8. useState
+
 - Hook để quản lý state, state là dữ liệu có thể thay đổi theo thời gian, khi state thay đổi React sẽ render lại component chứa state đó và component con
 - Khi sử dụng giá trị state, react dùng giá trị đó để render lại component, giá trị state được cập nhật tự động
 - Khi gọi hàm setState thì react k cập nhật ngay lập tức mà đánh dấu cần render lại, sau đó react render lại component với giá trị state mới
 - khai báo useState ở đầu component, k đặt trong if, for, function
+
 #### init? trong fetch
+
 ![alt text](image-3.png)
+
 - Dùng init khi muốn tùy chỉnh cách gửi request, cần gửi thêm dữ liệu, header/token
-![alt text](image-4.png)
+  ![alt text](image-4.png)
+
+#### Commit lên browser và render
+
+app-> render-> dom ảo-> commit -> dom thật-> browser
+
+#### useCallback
+
+- useCallBack(fn, dependencies)
+  => fn ko chạy lại khi component bị render
+
+#### Memo
+
+![link](https://react.dev/reference/react/memo)
+
+#### useMemo va Memo
+
+Khac nhau
+useMemo(fn, deps) ghi nhớ giá trị trả về của fn bên trong một component để tránh tính lại tốn kém khi deps không đổi.
+
+React.memo(Component, areEqual?) ghi nhớ kết quả render của một component con; nếu props không đổi (so bởi areEqual), component con không re-render.
+Ví dụ
+
+```html
+import React, { useMemo, useState } from "react";
+
+// Child đắt -> bọc React.memo
+const Row = React.memo(function Row({ item }: { item: { id: number; name: string } }) {
+  console.log("Render Row", item.id);
+  return <li>{item.name}</li>;
+});
+
+export default function DemoList() {
+  const [keyword, setKeyword] = useState("");
+  const [count, setCount] = useState(0);
+
+  const data = useMemo(
+    () => Array.from({ length: 5000 }, (_, i) => ({ id: i + 1, name: `Item ${i + 1}` })),
+    []
+  );
+
+  // Lọc dữ liệu tốn kém -> useMemo để không filter lại khi 'count' đổi
+  const filtered = useMemo(() => {
+    const lower = keyword.toLowerCase();
+    return data.filter((it) => it.name.toLowerCase().includes(lower));
+  }, [data, keyword]);
+
+  return (
+    <div>
+      <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Search..." />
+      <button onClick={() => setCount((c) => c + 1)}>Increase count ({count})</button>
+      <ul>
+        {filtered.map((it) => (
+          <Row key={it.id} item={it} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+```
+### cookie
+Session Cookie
+Được lưu tạm thời trong bộ nhớ máy tính trong lúc bạn đang truy cập Website đó và sẽ tự động xóa khi bạn đóng trình duyệt, bạn sẽ rất dễ dàng bắt gặp những Session Cookie này khi đang truy cập Website và máy hết pin tắt đột ngột, bạn có thể mở máy tính lên, trình duyệt sẽ tự động hỏi bạn có muốn load lại những trang mà bạn đã từng truy cập lúc nãy không.
+
+Persistent Cookie
+Được lưu trên ổ cứng máy tính và không bị xóa khi bạn đóng trình duyệt. Bạn có thể thấy loại Cookie này khi bạn quay trở lại một trang web nào đó và thông tin đăng nhập của bạn vẫn còn sẵn, không bị mất đi.
